@@ -26,8 +26,19 @@ void helloWorld() {
  */
  
 void fizzBuzz() {
-  //complete
-
+  for (int n <- [1 .. 100]) {
+    if (n % 3 == 0) {
+      if (n % 5 == 0) {
+        println("FizzBuzz");
+      } else {
+        println("Fizz");
+      }
+    } else if (n % 5 == 0) {
+      println("Buzz");
+    } else {
+      println("<n>");
+    }  
+  }
 }
 
 list[str] fizzBuzzList() {
