@@ -26,7 +26,7 @@ void helloWorld() {
  */
  
 void fizzBuzz() {
-  for (int n <- [1 .. 101]) {
+  for (int n <- [1 .. 100]) {
     switch (<n % 3 == 0, n % 5 == 0>) {
       case <true,true>:
         println("FizzBuzz");
@@ -41,7 +41,7 @@ void fizzBuzz() {
 }
 
 list[str] fizzBuzzList() {
-  return for (int n <- [1 .. 101]) {
+  return for (int n <- [1 .. 100]) {
     switch (<n % 3 == 0, n % 5 == 0>) {
       case <true,true>:
         append "FizzBuzz";
@@ -70,18 +70,20 @@ test bool testfizzBuzzList() = fizzBuzzList() == fbls;
  */
  
 int fact1(int n) {
-  return -1; // <- replace
+  return n < 2 ? 1 : fact1(n-1) * n;
 }
 
 int fact2(0) = 1;
 int fact2(1) = 1;
-//default int fact2(int n) = complete
+default int fact2(int n) = n * fact2(n-1);
 
 int fact3(int n) {
-  //switch (n) {
-  // complete  
-  // }
-  return -1; // <- replace
+  switch (n) {
+    case 0:
+      return 1;
+    default:
+      return n * fact3(n-1);
+  }
 }
 
 // Now that we have three implementations, let us write a test let us write a test so they 
