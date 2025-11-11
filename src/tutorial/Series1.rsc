@@ -104,14 +104,19 @@ test bool testfactorial(int n) = n >= 0 && n < 20 ? fact2(n) == fact3(n) : true;
 void comprehensions() {
 
   // construct a list of squares of integer from 0 to 9 (use range [0..10])
+  list[int] sqrsList = [ x*x | x <- [0 .. 10] ];
   
   // same, but construct a set
+  set[int] sqrsSet = { x*x | x <- [0 .. 10] };
   
   // same, but construct a map
+  map[int, int] sqrsMap = ( x: x*x | x <- [0 .. 10] );
 
   // construct a list of factorials from 0 to 9
-  
+  list[int] factList = [ fact2(x) | x <- [0 .. 10] ];
+
   // same, but now only for even numbers  
+  list[int] factEvenList = [ fact2(x) | x <- [0 .. 10], x % 2 == 0 ];
 }
  
 
