@@ -42,7 +42,19 @@ void fizzBuzz() {
 }
 
 list[str] fizzBuzzList() {
-  return []; // complete and replace
+  for (int n <- [1 .. 101]) {
+    if (n % 3 == 0) {
+      if (n % 5 == 0) {
+        println("FizzBuzz");
+      } else {
+        println("Fizz");
+      }
+    } else if (n % 5 == 0) {
+      println("Buzz");
+    } else {
+      println("<n>");
+    }  
+  }
 }
 
 // We can test for fizzBuzzList as follows. Just run from console using :test
