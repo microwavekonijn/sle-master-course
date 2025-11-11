@@ -26,34 +26,32 @@ void helloWorld() {
  */
  
 void fizzBuzz() {
-  for (int n <- [1 .. 100]) {
-    if (n % 3 == 0) {
-      if (n % 5 == 0) {
+  for (int n <- [1 .. 101]) {
+    switch (<n % 3 == 0, n % 5 == 0>) {
+      case <true,true>:
         println("FizzBuzz");
-      } else {
+      case <true,false>:
         println("Fizz");
-      }
-    } else if (n % 5 == 0) {
-      println("Buzz");
-    } else {
-      println("<n>");
-    }  
+      case <false,true>:
+        println("Buzz");
+      default:
+        println("<n>");
+    }
   }
 }
 
 list[str] fizzBuzzList() {
-  for (int n <- [1 .. 101]) {
-    if (n % 3 == 0) {
-      if (n % 5 == 0) {
-        println("FizzBuzz");
-      } else {
-        println("Fizz");
-      }
-    } else if (n % 5 == 0) {
-      println("Buzz");
-    } else {
-      println("<n>");
-    }  
+  return for (int n <- [1 .. 101]) {
+    switch (<n % 3 == 0, n % 5 == 0>) {
+      case <true,true>:
+        append "FizzBuzz";
+      case <true,false>:
+        append "Fizz";
+      case <false,true>:
+        append "Buzz";
+      default:
+        append "<n>";
+    }
   }
 }
 
