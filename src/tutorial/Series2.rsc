@@ -17,7 +17,9 @@ syntax Object
   ;
   
 syntax Element
-  = ; // Fill in  
+  = PropName ":" Value; // Fill in
+
+lexical PropName = [\"] ![\"]* [\"];
   
 syntax Value
   = String
@@ -32,8 +34,8 @@ syntax Null
   = "null";
   
 syntax Boolean
-  = // Fill in
-  | // Fill in
+  = "true"  // Fill in
+  | "false" // Fill in
   ;  
   
 syntax Array
@@ -44,7 +46,7 @@ lexical String
   = [\"] ![\"]* [\"]; // slightly simplified
   
 lexical Number
-  = ; // Fill in. Hint; think of the pattern for numbers in regular expressions. How do you accept a number in a regex?  
+  = [0-9]+; // Fill in. Hint; think of the pattern for numbers in regular expressions. How do you accept a number in a regex?  
 
 layout Whitespace = [\ \t\n]* !>> [\ \t\n];  
   
@@ -57,7 +59,10 @@ start[JSON] example()
           '  \"address\": {
           '     \"street\": \"Wallstreet\",
           '     \"number\": 102
-          '  }
+          '  },
+          '  \"array\": [1,2,3],
+          '  \"bool\": true,
+          '  \"empty\": null
           '}");    
   
 
@@ -66,7 +71,7 @@ start[JSON] example()
 // - use concrete pattern matching
 // - use "<x>" to convert a String x to str
 set[str] propNames(start[JSON] json) {
-
+  return {unquote("<k>") | /(PropName) k := json};
 }
 
 // define a recursive transformation mapping JSON to map[str,value] 
@@ -76,15 +81,20 @@ set[str] propNames(start[JSON] json) {
 map[str, value] json2map(start[JSON] json) = json2map(json.top);
 
 map[str, value] json2map((JSON)`<Object obj>`)  = json2map(obj);
-map[str, value] json2map((Object)`{<{Element ","}* elems>}`) = ( /* Create the map using a comprehension */);
+map[str, value] json2map((Object)`{<{Element ","}* elems>}`) = ( unquote("<k>"):json2value(v) | (Element) `<PropName k>:<Value v>` <- elems );
+
+list[value] json2array((Array)`[<{Value ","}* values>]`) = [json2value(v) | v <- values];
 
 str unquote(str s) = s[1..-1];
 
-value json2value((Value)`<String s>`)    = unquote("<s>"); // This is an example how to transform the String literal to a value
-value json2value((Value)`<Number n>`)    = -1; // ... This needs to change. The String module contains a function to convert a str to int
-// The other alternatives are missing. You need to add them.
+value json2value((Value)`<String s>`)    = unquote("<s>");
+value json2value((Value)`<Number n>`)    = toInt("<n>");
+value json2value((Value)`<Object obj>`)  = json2map(obj);
+value json2value((Value)`<Array arr>`)   = json2array(arr);
+value json2value((Value)`<Boolean b>`)   = "<b>" == "true";
+value json2value((Value)`<Null _>`)      = 0; // Best alternative, otherwise requires adding datatype and changing return signature
 
-default value json2value(Value v) { throw "No tranformation function for `<v>` defined"; }
+// default value json2value(Value v) { throw "No tranformation function for `<v>` defined"; }
 
 test bool example2map() = json2map(example()) == (
   "age": 42,
@@ -92,6 +102,9 @@ test bool example2map() = json2map(example()) == (
   "address" : (
      "street" : "Wallstreet",
      "number" : 102
-  )
+  ),
+  "array": [1,2,3],
+  "bool": true,
+  "empty": 0
 );
 

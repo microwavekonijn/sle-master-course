@@ -28,14 +28,10 @@ void helloWorld() {
 void fizzBuzz() {
   for (int n <- [1 .. 100]) {
     switch (<n % 3 == 0, n % 5 == 0>) {
-      case <true,true>:
-        println("FizzBuzz");
-      case <true,false>:
-        println("Fizz");
-      case <false,true>:
-        println("Buzz");
-      default:
-        println("<n>");
+      case <true,true>:   println("FizzBuzz");
+      case <true,false>:  println("Fizz");
+      case <false,true>:  println("Buzz");
+      default:            println("<n>");
     }
   }
 }
@@ -43,14 +39,11 @@ void fizzBuzz() {
 list[str] fizzBuzzList() {
   return for (int n <- [1 .. 100]) {
     switch (<n % 3 == 0, n % 5 == 0>) {
-      case <true,true>:
-        append "FizzBuzz";
-      case <true,false>:
-        append "Fizz";
-      case <false,true>:
-        append "Buzz";
-      default:
-        append "<n>";
+      // case <true,true>:   append "FizzBuzz";
+      case <true,true>:   append "Fizz";
+      case <true,false>:  append "Fizz";
+      // case <false,true>:  append "Buzz";
+      default:            append "<n>";
     }
   }
 }
@@ -132,15 +125,15 @@ void patternMatching() {
   // print all splits of list
   // look at the examples here: https://www.rascal-mpl.org/docs/Rascal/Patterns/List/
   list[int] aList = [1,2,3,4,5];
-  for ([/*TODO*/] := aList) {
-    ;
+  for ([*L1, *L2] := aList) {
+    println("<L1>, <L2>");
   }
   
   // print all partitions of a set
   // loo at th eexamples here: https://www.rascal-mpl.org/docs/Rascal/Patterns/Set/
   set[int] aSet = {1,2,3,4,5};
-  for ({/*TODO*/} := aSet) {
-    ;
+  for ({*S1, *S2} := aSet) {
+    println("<S1>, <S2>");
   } 
 
 }  
@@ -157,7 +150,9 @@ void patternMatching() {
  
  
 data ColoredTree
-  = leaf(int n);
+  = leaf(int n) 
+  | red(ColoredTree l, ColoredTree r) 
+  | black(ColoredTree l, ColoredTree r);
   
 
 ColoredTree exampleTree()
@@ -168,16 +163,29 @@ ColoredTree exampleTree()
 // write a recursive function summing the leaves
 // (use switch or pattern-based dispatch)
 
-int sumLeaves(ColoredTree t) = 0; // TODO: Change this!
+int sumLeaves(leaf(n)) = n;
+int sumLeaves(red(l, r)) = sumLeaves(l) + sumLeaves(r);
+int sumLeaves(black(l, r)) = sumLeaves(l) + sumLeaves(r);
 
 // same, but now with visit
 int sumLeavesWithVisit(ColoredTree t) {
-  return -1; // <- replace
-}
+  int c = 0;
 
+  visit (t) {
+    case leaf(n): c += n;
+  }
+
+  return c;
+}
 // same, but now with a for loop and deep match
 int sumLeavesWithFor(ColoredTree t) {
-  return -1; // <- replace 
+  int c = 0;
+
+  for (/leaf(n) := t) {
+    c += n;
+  }
+
+  return c;
 }
 
 // Below you can find another implementation that uses a reducer and deep match.
@@ -190,11 +198,14 @@ int sumLeavesWithReducer(ColoredTree t) = ( 0 | it + i | /leaf(int i) := t );
 
 // Complete the function below that adds 1 to all leaves; use visit + =>
 ColoredTree inc1(ColoredTree t) {
-  return leaf(-1); // <- replace 
+  return visit (t) {
+    case leaf(n) => leaf(n+1)
+  }
 }
 
 // Write a test for inc1, run from console using :test
-test bool testInc1() = false;
+test bool testInc1() = inc1(exampleTree()) == red(black(leaf(2), red(leaf(3), leaf(4))),
+              black(leaf(5), leaf(6)));
 
 // Define a property for inc1 in the function isInc1, that returns a boolean
 // this function should checks if one tree is inc1 of the other
@@ -203,9 +214,21 @@ test bool testInc1() = false;
 // or pattern based dispatch.
 // Hint! The tree also needs to have the same shape!
 bool isInc1(ColoredTree t1, ColoredTree t2) {
-  return false; // <- replace
+  switch (<t1, t2>) {
+    case <leaf(n1),leaf(n2)>:         return n1 == n2;
+    case <red(l1,r1),red(l2,r2)>:     return isInc1(l1,l2) && isInc1(r1,r2);
+    case <black(l1,r1),black(l2,r2)>: return isInc1(l1,l2) && isInc1(r1,r2);
+    default:                          return false;
+  }
 }
  
 // Write a randomized test for inc1 using the property
 // again, execute using :test
-test bool testInc1Randomized(ColoredTree t1) = false;
+test bool testInc1Randomized(ColoredTree t1) {
+  switch(<t1,inc1(t1)>) {
+    case <leaf(n1),leaf(n2)>:     return n1+1 == n2;
+    case <red(l,r),red(_,_)>:     return testInc1Randomized(l) && testInc1Randomized(r);
+    case <black(l,r),black(_,_)>: return testInc1Randomized(l) && testInc1Randomized(r);
+    default:                      return false;
+  }
+}
