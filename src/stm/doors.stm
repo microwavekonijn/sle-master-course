@@ -1,0 +1,17 @@
+
+machine Doors
+
+    state closed
+        open => opened
+        lock => locked
+    end
+
+    state opened
+        close => closed
+    end
+
+    state locked4
+        unlock => closed2
+    end
+
+end
