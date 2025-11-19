@@ -1,0 +1,7 @@
+form "Simple form" {
+    "A number" num: integer
+
+    if (num) {
+        "X" x: boolean
+    }
+}

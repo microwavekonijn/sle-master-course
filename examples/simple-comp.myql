@@ -1,0 +1,5 @@
+form "Simple form" {
+    "A number" num: integer = 10
+
+    "A bool" bool = true
+}

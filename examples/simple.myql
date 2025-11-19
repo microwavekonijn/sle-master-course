@@ -1,0 +1,3 @@
+form "Simple form" {
+    "A number" num: integer
+}
