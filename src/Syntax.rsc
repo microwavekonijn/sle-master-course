@@ -52,4 +52,3 @@ syntax Expr
   >       var: Id name \ "true" \"false"
   |       lit: Bool | Int | Str
   ;
-// TODO: Add parenthesis
